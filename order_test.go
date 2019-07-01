@@ -18,7 +18,7 @@ func TestWXPay_UnifiedOrder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(result.PrepayId, result.CodeURL, result.MWebURL)
+	t.Log(result.PrepayID, result.CodeURL, result.MWebURL)
 }
 
 func TestWXPay_AppPay(t *testing.T) {
@@ -35,7 +35,7 @@ func TestWXPay_AppPay(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Log("以下为 TradeType 为 APP 时附加的信息")
-	t.Log("AppId", result.AppId)
+	t.Log("AppId", result.AppID)
 	// 	t.Log("PartnerId", result.PartnerId)
 	// 	t.Log("PrepayId", result.PrepayId)
 	// 	t.Log("Package", result.Package)
@@ -53,7 +53,7 @@ func TestWXPay_OrderQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(result.TradeState, result.OutTradeNo, result.TransactionId)
+	t.Log(result.TradeState, result.OutTradeNo, result.TransactionID)
 }
 
 func TestWXPay_CloseOrder(t *testing.T) {

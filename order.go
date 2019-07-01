@@ -38,10 +38,10 @@ func (p *Client) AppPay(param UnifiedOrderParam) (rsp *UnifiedOrderRsp, err erro
 	if rsp != nil {
 
 		var u = url.Values{}
-		u.Set("appid", param.AppId)
+		u.Set("appid", param.AppID)
 		u.Set("noncestr", GetNonceStr())
 		u.Set("partnerid", p.mchID)
-		u.Set("prepayid", rsp.PrepayId)
+		u.Set("prepayid", rsp.PrepayID)
 		u.Set("package", "Sign=WXPay")
 		u.Set("timestamp", fmt.Sprintf("%d", time.Now().Unix()))
 		u.Set("sign", SignMD5(u, p.apiKey))
@@ -62,9 +62,9 @@ func (p *Client) JSAPIPay(param UnifiedOrderParam) (rsp *UnifiedOrderRsp, err er
 	if rsp != nil {
 
 		var u = url.Values{}
-		u.Set("appId", param.AppId)
+		u.Set("appId", param.AppID)
 		u.Set("nonceStr", GetNonceStr())
-		u.Set("package", fmt.Sprintf("prepay_id=%s", rsp.PrepayId))
+		u.Set("package", fmt.Sprintf("prepay_id=%s", rsp.PrepayID))
 		u.Set("signType", kSignTypeMD5)
 		u.Set("timeStamp", fmt.Sprintf("%d", time.Now().Unix()))
 		u.Set("paySign", SignMD5(u, p.apiKey))
@@ -126,7 +126,7 @@ func (p *Client) CloseOrder(param CloseOrderParam) (result *CloseOrderRsp, err e
 }
 
 var (
-	kXML = []byte("<xml>")
+	XMLFlag = []byte("<xml>")
 )
 
 // DownloadBill https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_6
@@ -161,7 +161,7 @@ func (p *Client) DownloadBill(param DownloadBillParam) (result *DownloadBillRsp,
 		return nil, err
 	}
 
-	if bytes.Index(data, kXML) == 0 {
+	if bytes.Index(data, XMLFlag) == 0 {
 		err = xml.Unmarshal(data, &result)
 	} else {
 		if p.isProduction {
