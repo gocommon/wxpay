@@ -36,12 +36,12 @@ func TestWXPay_AppPay(t *testing.T) {
 	}
 	t.Log("以下为 TradeType 为 APP 时附加的信息")
 	t.Log("AppId", result.AppId)
-	t.Log("PartnerId", result.PartnerId)
-	t.Log("PrepayId", result.PrepayId)
-	t.Log("Package", result.Package)
-	t.Log("NonceStr", result.NonceStr)
-	t.Log("TimeStamp", result.TimeStamp)
-	t.Log("Sign", result.Sign)
+	// 	t.Log("PartnerId", result.PartnerId)
+	// 	t.Log("PrepayId", result.PrepayId)
+	// 	t.Log("Package", result.Package)
+	// 	t.Log("NonceStr", result.NonceStr)
+	// 	t.Log("TimeStamp", result.TimeStamp)
+	// 	t.Log("Sign", result.Sign)
 }
 
 func TestWXPay_OrderQuery(t *testing.T) {

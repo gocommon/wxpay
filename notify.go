@@ -9,8 +9,8 @@ import (
 )
 
 // GetTradeNotification https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_7&index=3
-func (this *Client) GetTradeNotification(req *http.Request) (*TradeNotification, error) {
-	key, err := this.getKey()
+func (p *Client) GetTradeNotification(req *http.Request) (*TradeNotification, error) {
+	key, err := p.getKey()
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func GetTradeNotification(req *http.Request, key string) (noti *TradeNotificatio
 	return noti, err
 }
 
-func (this *Client) AckNotification(w http.ResponseWriter) {
+func (p *Client) AckNotification(w http.ResponseWriter) {
 	AckNotification(w)
 }
 

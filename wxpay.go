@@ -30,10 +30,11 @@ type Client struct {
 	isProduction bool
 }
 
-func New(appId, apiKey, mchId string, isProduction bool) (client *Client) {
+// New New
+func New(appID, apiKey, mchID string, isProduction bool) (client *Client) {
 	client = &Client{}
-	client.appId = appId
-	client.mchId = mchId
+	client.appId = appID
+	client.mchId = mchID
 	client.apiKey = apiKey
 	client.Client = http.DefaultClient
 	client.isProduction = isProduction
@@ -67,7 +68,8 @@ func initTLSClient(cert []byte, password string) (tlsClient *http.Client, err er
 	return tlsClient, err
 }
 
-func (this *Client) LoadCert(path string) (err error) {
+// LoadCert LoadCert
+func (p *Client) LoadCert(path string) (err error) {
 	if len(path) == 0 {
 		return ErrNotFoundCertFile
 	}
@@ -77,57 +79,57 @@ func (this *Client) LoadCert(path string) (err error) {
 		return err
 	}
 
-	tlsClient, err := initTLSClient(cert, this.mchId)
+	tlsClient, err := initTLSClient(cert, p.mchId)
 	if err != nil {
 		return err
 	}
-	this.tlsClient = tlsClient
+	p.tlsClient = tlsClient
 	return nil
 }
 
-func (this *Client) URLValues(param Param, key string) (value url.Values, err error) {
-	var p = param.Params()
-	if _, ok := p["appid"]; ok == false {
-		p.Set("appid", this.appId)
+// URLValues URLValues
+func (p *Client) URLValues(param Param, key string) (value url.Values, err error) {
+	var vals = param.Params()
+	if appid := vals["appid"]; len(appid) == 0 {
+		vals.Set("appid", p.appId)
 	}
-	p.Set("mch_id", this.mchId)
-	p.Set("nonce_str", GetNonceStr())
+	vals.Set("mch_id", p.mchId)
+	vals.Set("nonce_str", GetNonceStr())
 
-	if _, ok := p["notify_url"]; ok == false {
-		if len(this.NotifyURL) > 0 {
-			p.Set("notify_url", this.NotifyURL)
+	if _, ok := vals["notify_url"]; ok == false {
+		if len(p.NotifyURL) > 0 {
+			vals.Set("notify_url", p.NotifyURL)
 		}
 	}
 
-	var sign = SignMD5(p, key)
-	p.Set("sign", sign)
-	return p, nil
+	vals.Set("sign", SignMD5(vals, key))
+	return vals, nil
 }
 
-func (this *Client) doRequest(method, url string, param Param, result interface{}) (err error) {
-	return this.doRequestWithClient(this.Client, method, url, param, result)
+func (p *Client) doRequest(method, url string, param Param, result interface{}) (err error) {
+	return p.doRequestWithClient(p.Client, method, url, param, result)
 }
 
-func (this *Client) doRequestWithTLS(method, url string, param Param, result interface{}) (err error) {
-	if this.tlsClient == nil {
+func (p *Client) doRequestWithTLS(method, url string, param Param, result interface{}) (err error) {
+	if p.tlsClient == nil {
 		return ErrNotFoundTLSClient
 	}
 
-	return this.doRequestWithClient(this.tlsClient, method, url, param, result)
+	return p.doRequestWithClient(p.tlsClient, method, url, param, result)
 }
 
-func (this *Client) doRequestWithClient(client *http.Client, method, url string, param Param, result interface{}) (err error) {
-	key, err := this.getKey()
+func (p *Client) doRequestWithClient(client *http.Client, method, url string, param Param, result interface{}) (err error) {
+	key, err := p.getKey()
 	if err != nil {
 		return err
 	}
 
-	p, err := this.URLValues(param, key)
+	vals, err := p.URLValues(param, key)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest(method, url, strings.NewReader(URLValueToXML(p)))
+	req, err := http.NewRequest(method, url, strings.NewReader(URLValueToXML(vals)))
 	if err != nil {
 		return err
 	}
@@ -156,42 +158,43 @@ func (this *Client) doRequestWithClient(client *http.Client, method, url string,
 	return err
 }
 
-func (this *Client) DoRequest(method, url string, param Param, results interface{}) (err error) {
-	return this.doRequest(method, url, param, results)
+// DoRequest DoRequest
+func (p *Client) DoRequest(method, url string, param Param, results interface{}) (err error) {
+	return p.doRequest(method, url, param, results)
 }
 
-func (this *Client) getKey() (key string, err error) {
-	if this.isProduction == false {
-		key, err = this.getSignKey(this.apiKey)
+func (p *Client) getKey() (key string, err error) {
+	if p.isProduction == false {
+		key, err = p.getSignKey(p.apiKey)
 		if err != nil {
 			return "", err
 		}
 	} else {
-		key = this.apiKey
+		key = p.apiKey
 	}
 	return key, err
 }
 
-func (this *Client) SignMD5(param url.Values) (sign string) {
-	return SignMD5(param, this.apiKey)
+// SignMD5 SignMD5
+func (p *Client) SignMD5(param url.Values) (sign string) {
+	return SignMD5(param, p.apiKey)
 }
 
-func (this *Client) getSignKey(apiKey string) (key string, err error) {
-	var p = make(url.Values)
-	p.Set("mch_id", this.mchId)
-	p.Set("nonce_str", GetNonceStr())
+func (p *Client) getSignKey(apiKey string) (key string, err error) {
+	var vals = make(url.Values)
+	vals.Set("mch_id", p.mchId)
+	vals.Set("nonce_str", GetNonceStr())
 
-	var sign = SignMD5(p, apiKey)
-	p.Set("sign", sign)
+	vals.Set("sign", SignMD5(vals, apiKey))
 
-	req, err := http.NewRequest("POST", "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey", strings.NewReader(URLValueToXML(p)))
+	req, err := http.NewRequest("POST", "https://api.mch.weixin.qq.com/sandboxnew/pay/getsignkey", strings.NewReader(URLValueToXML(vals)))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Accept", "application/xml")
 	req.Header.Set("Content-Type", "application/xml;charset=utf-8")
 
-	resp, err := this.Client.Do(req)
+	resp, err := p.Client.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
 	}
@@ -210,8 +213,9 @@ func (this *Client) getSignKey(apiKey string) (key string, err error) {
 	return signKey.SandboxSignKey, nil
 }
 
-func (this *Client) BuildAPI(paths ...string) string {
-	var path = this.apiDomain
+// BuildAPI BuildAPI
+func (p *Client) BuildAPI(paths ...string) string {
+	var path = p.apiDomain
 	for _, p := range paths {
 		p = strings.TrimSpace(p)
 		if len(p) > 0 {
@@ -229,6 +233,7 @@ func (this *Client) BuildAPI(paths ...string) string {
 	return path
 }
 
+// URLValueToXML URLValueToXML
 func URLValueToXML(m url.Values) string {
 	var xmlBuffer = &bytes.Buffer{}
 	xmlBuffer.WriteString("<xml>")
@@ -245,6 +250,7 @@ func URLValueToXML(m url.Values) string {
 	return xmlBuffer.String()
 }
 
+// SignMD5 SignMD5
 func SignMD5(param url.Values, key string) (sign string) {
 	var pList = make([]string, 0, 0)
 	for key := range param {
@@ -267,6 +273,7 @@ func SignMD5(param url.Values, key string) (sign string) {
 	return sign
 }
 
+// VerifyResponseData VerifyResponseData
 func VerifyResponseData(data []byte, key string) (ok bool, err error) {
 	var param = make(XMLMap)
 	err = xml.Unmarshal(data, &param)
@@ -277,6 +284,7 @@ func VerifyResponseData(data []byte, key string) (ok bool, err error) {
 	return VerifyResponseValues(url.Values(param), key)
 }
 
+// VerifyResponseValues VerifyResponseValues
 func VerifyResponseValues(param url.Values, key string) (bool, error) {
 	// 处理错误信息
 	var code = param.Get("return_code")
@@ -308,6 +316,7 @@ func VerifyResponseValues(param url.Values, key string) (bool, error) {
 	return false, errors.New("签名验证失败")
 }
 
+// GetNonceStr GetNonceStr
 func GetNonceStr() (nonceStr string) {
 	chars := "abcdefghijklmnopqrstuvwxyz0123456789"
 	var r = rand.New(rand.NewSource(time.Now().UnixNano()))

@@ -107,6 +107,7 @@ type UnifiedOrderRsp struct {
 	TradeType  string `xml:"trade_type"`
 	CodeURL    string `xml:"code_url"`
 	MWebURL    string `xml:"mweb_url"`
+	Payinfo    string `xml:"-"` // 支付用到的信息，native:二维码地址，mweb:支付跳转连接，app,jsapi:调起支付需要的参数url.Values.Encode()
 }
 
 // 客户端唤起支付所需要的信息：App 支付、微信内H5调起支付(公众号支付)、小程序支付
