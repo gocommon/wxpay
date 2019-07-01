@@ -19,10 +19,11 @@ import (
 	"golang.org/x/crypto/pkcs12"
 )
 
+// Client Client
 type Client struct {
-	appId        string
+	appID        string
 	apiKey       string
-	mchId        string
+	mchID        string
 	Client       *http.Client
 	tlsClient    *http.Client
 	apiDomain    string
@@ -33,8 +34,8 @@ type Client struct {
 // New New
 func New(appID, apiKey, mchID string, isProduction bool) (client *Client) {
 	client = &Client{}
-	client.appId = appID
-	client.mchId = mchID
+	client.appID = appID
+	client.mchID = mchID
 	client.apiKey = apiKey
 	client.Client = http.DefaultClient
 	client.isProduction = isProduction
@@ -79,7 +80,7 @@ func (p *Client) LoadCert(path string) (err error) {
 		return err
 	}
 
-	tlsClient, err := initTLSClient(cert, p.mchId)
+	tlsClient, err := initTLSClient(cert, p.mchID)
 	if err != nil {
 		return err
 	}
@@ -91,9 +92,9 @@ func (p *Client) LoadCert(path string) (err error) {
 func (p *Client) URLValues(param Param, key string) (value url.Values, err error) {
 	var vals = param.Params()
 	if appid := vals["appid"]; len(appid) == 0 {
-		vals.Set("appid", p.appId)
+		vals.Set("appid", p.appID)
 	}
-	vals.Set("mch_id", p.mchId)
+	vals.Set("mch_id", p.mchID)
 	vals.Set("nonce_str", GetNonceStr())
 
 	if _, ok := vals["notify_url"]; ok == false {
@@ -182,7 +183,7 @@ func (p *Client) SignMD5(param url.Values) (sign string) {
 
 func (p *Client) getSignKey(apiKey string) (key string, err error) {
 	var vals = make(url.Values)
-	vals.Set("mch_id", p.mchId)
+	vals.Set("mch_id", p.mchID)
 	vals.Set("nonce_str", GetNonceStr())
 
 	vals.Set("sign", SignMD5(vals, apiKey))

@@ -40,7 +40,7 @@ func (p *Client) AppPay(param UnifiedOrderParam) (rsp *UnifiedOrderRsp, err erro
 		var u = url.Values{}
 		u.Set("appid", param.AppId)
 		u.Set("noncestr", GetNonceStr())
-		u.Set("partnerid", p.mchId)
+		u.Set("partnerid", p.mchID)
 		u.Set("prepayid", rsp.PrepayId)
 		u.Set("package", "Sign=WXPay")
 		u.Set("timestamp", fmt.Sprintf("%d", time.Now().Unix()))
